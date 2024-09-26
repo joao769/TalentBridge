@@ -26,8 +26,6 @@ O diagrama abaixo mostra as interações entre os principais atores e as funcion
 
 ---
 
----
-
 ## 📋 Diagrama de Classes
 
 O diagrama abaixo mostra as classes principais, seus atributos e métodos, além dos relacionamentos entre as entidades do sistema:
