@@ -25,3 +25,17 @@ O diagrama abaixo mostra as interações entre os principais atores e as funcion
 > **Descrição**: Esse diagrama ilustra como candidatos e empresas interagem com as principais funcionalidades do sistema, incluindo o gerenciamento de vagas e cadastro de candidatos.
 
 ---
+
+---
+
+## 📋 Diagrama de Classes
+
+O diagrama abaixo mostra as classes principais, seus atributos e métodos, além dos relacionamentos entre as entidades do sistema:
+
+<div align="center">
+    <img src="" alt="Diagrama de Classes do sistema" width="600" height="400">
+</div>
+
+> **Descrição**: Esse diagrama descreve a estrutura das classes `Empresa`, `Candidato`, `Vaga`, `IA` e `Geolocalizacao` mostrando como elas se relacionam. Os atributos e métodos de cada classe são indicados. É útil para entender como os dados estão organizados no projeto.
+
+---
