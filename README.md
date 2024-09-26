@@ -22,6 +22,6 @@ O diagrama abaixo mostra as interações entre os principais atores e as funcion
     <img src="Diagramas/Diagrama%20de%20Casos%20de%20Uso.png" alt="Diagrama de Casos de Uso do sistema" width="600" height="400">
 </div>
 
-> **Descrição**: Esse diagrama ilustra como candidatos, empresas e o administrador interagem com as principais funcionalidades do sistema, incluindo o gerenciamento de vagas, cadastro de candidatos e aprovação de processos seletivos.
+> **Descrição**: Esse diagrama ilustra como candidatos e empresas interagem com as principais funcionalidades do sistema, incluindo o gerenciamento de vagas e cadastro de candidatos.
 
 ---
