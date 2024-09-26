@@ -10,7 +10,7 @@ O **Sistema de Recrutamento** é uma aplicação que facilita o processo de recr
 - **Funcionalidades Principais**:
   - Cadastro e gerenciamento de vagas.
   - Visualização de candidatos e empresas.
-  - Processo de seleção com ajuda da IA.
+  - Processo de seleção com a ajuda da IA.
 
 ---
 
