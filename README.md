@@ -1,6 +1,6 @@
 # Sistema De Recrutamento
 
-### Diagrama de Casos de Uso
+## Diagrama de Casos de Uso
 
 Esse diagrama representa os casos de uso do sistema, destacando como os atores interagem com as funcionalidades principais:
 
