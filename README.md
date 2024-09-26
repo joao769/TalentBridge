@@ -10,7 +10,7 @@ O **Sistema de Recrutamento** é uma aplicação que facilita o processo de recr
 - **Funcionalidades Principais**:
   - Cadastro e gerenciamento de vagas.
   - Visualização de candidatos e empresas.
-  - Processo de seleção automatizado e assistido por IA.
+  - Processo de seleção com ajuda da IA.
 
 ---
 
@@ -34,6 +34,6 @@ O diagrama abaixo mostra as classes principais, seus atributos e métodos, além
     <img src="" alt="Diagrama de Classes do sistema" width="600" height="400">
 </div>
 
-> **Descrição**: Esse diagrama descreve a estrutura das classes `Empresa`, `Candidato`, `Vaga`, `IA` e `Geolocalizacao` mostrando como elas se relacionam. Os atributos e métodos de cada classe são indicados. É útil para entender como os dados estão organizados no projeto.
+> **Descrição**: Esse diagrama descreve a estrutura das classes `Empresa`, `Candidato`, `Vaga`, `IA` e `Geolocalizacao` mostrando como elas se relacionam. Os atributos e métodos de cada classe são indicados. Esse diagrama é útil para entender como os dados estão organizados no projeto.
 
 ---
