@@ -4,7 +4,7 @@ O **Talent Brigde** é uma aplicação que facilita o processo de recrutamento e
 
 ---
 
-## 🔍 Visão Geral do Projeto
+## 🔍 Visão Geral
 
 - **Objetivo**: Facilitar a interação entre candidatos e empresas, proporcionando uma visão clara das oportunidades disponíveis.
 - **Funcionalidades Principais**:
