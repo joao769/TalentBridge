@@ -19,7 +19,7 @@ O **Talent Brigde** é uma aplicação que facilita o processo de recrutamento e
 O diagrama abaixo mostra as interações entre os principais atores e as funcionalidades do sistema:
 
 <div align="center">
-    <img src="Diagramas/Diagrama Casos de Uso.png" alt="Diagrama de Casos de Uso do sistema" width="600" height="400">
+    <img src="Diagramas/Diagrama de Casos de Uso.png" alt="Diagrama de Casos de Uso do sistema" width="600" height="400">
 </div>
 
 > **Descrição**: Esse diagrama ilustra como candidatos e empresas interagem com as principais funcionalidades do sistema, incluindo o gerenciamento de vagas e cadastro de candidatos.
