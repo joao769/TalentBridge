@@ -1,6 +1,6 @@
-# Sistema de Recrutamento
+# Talent Bridge
 
-O **Sistema de Recrutamento** é uma aplicação que facilita o processo de recrutamento e seleção, conectando empresas e candidatos de maneira eficiente e intuitiva.
+O **Talent Brigde** é uma aplicação que facilita o processo de recrutamento e seleção, conectando empresas e candidatos de maneira eficiente e intuitiva.
 
 ---
 
