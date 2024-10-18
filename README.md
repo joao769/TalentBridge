@@ -2,7 +2,6 @@
 
 O **Talent Brigde** é uma aplicação que facilita o processo de recrutamento e seleção, conectando empresas e candidatos de maneira eficiente e intuitiva.
 
----
 
 ## 🔍 Visão Geral
 
@@ -12,7 +11,6 @@ O **Talent Brigde** é uma aplicação que facilita o processo de recrutamento e
   - Visualização de candidatos e empresas.
   - Processo de seleção com a ajuda da IA.
 
----
 
 ## 📊 Diagrama de Casos de Uso
 
@@ -24,7 +22,6 @@ O diagrama abaixo mostra as interações entre os principais atores e as funcion
 
 > **Descrição**: Esse diagrama ilustra como candidatos e empresas interagem com as principais funcionalidades do sistema, incluindo o gerenciamento de vagas e cadastro de candidatos.
 
----
 
 ## 📋 Diagrama de Classes
 
