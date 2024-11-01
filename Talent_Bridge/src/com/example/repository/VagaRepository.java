@@ -1,122 +1,18 @@
 package com.example.repository;
 
+import com.example.database.DatabaseConnection;
+import com.example.model.Candidato;
 import com.example.model.Vaga;
 
-<<<<<<< HEAD
-import java.sql.*;
-=======
->>>>>>> 51da9c7e0b3b30c2a46b79eff28599efc8d7c368
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class VagaRepository {
-<<<<<<< HEAD
-    public void salvar(Vaga vaga) {
-        String sql = "INSERT INTO vagas (nome, descricao, salario, requisitos, endereco, status, empresa_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            stmt.setString(1, vaga.getNome());
-            stmt.setString(2, vaga.getDescricao());
-            stmt.setDouble(3, vaga.getSalario());
-            stmt.setString(4, vaga.getRequisitos());
-            stmt.setString(5, vaga.getEndereco());
-            stmt.setString(6, vaga.getStatus());
-            stmt.setLong(7, vaga.getEmpresaId());
-
-            stmt.executeUpdate();
-
-            // Recuperar o ID gerado
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    vaga.setId(generatedKeys.getLong(1));
-                } else {
-                    throw new SQLException("Falha ao obter o ID da vaga.");
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao salvar a vaga: " + e.getMessage());
-        }
-    }
-
-    public List<Vaga> listarTodas() {
-        List<Vaga> vagas = new ArrayList<>();
-        String sql = "SELECT * FROM vagas";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                Vaga vaga = new Vaga();
-                vaga.setId(rs.getLong("id"));
-                vaga.setNome(rs.getString("nome"));
-                vaga.setDescricao(rs.getString("descricao"));
-                vaga.setSalario(rs.getDouble("salario"));
-                vaga.setRequisitos(rs.getString("requisitos"));
-                vaga.setEndereco(rs.getString("endereco"));
-                vaga.setStatus(rs.getString("status"));
-                vaga.setEmpresaId(rs.getLong("empresa_id"));
-
-                vagas.add(vaga);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao listar as vagas: " + e.getMessage());
-        }
-        return vagas;
-    }
-
-    public Optional<Vaga> buscarPorId(Long id) {
-        String sql = "SELECT * FROM vagas WHERE id = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setLong(1, id);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                Vaga vaga = new Vaga();
-                vaga.setId(rs.getLong("id"));
-                vaga.setNome(rs.getString("nome"));
-                vaga.setDescricao(rs.getString("descricao"));
-                vaga.setSalario(rs.getDouble("salario"));
-                vaga.setRequisitos(rs.getString("requisitos"));
-                vaga.setEndereco(rs.getString("endereco"));
-                vaga.setStatus(rs.getString("status"));
-                vaga.setEmpresaId(rs.getLong("empresa_id"));
-
-                return Optional.of(vaga);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao buscar a vaga: " + e.getMessage());
-        }
-        return Optional.empty();
-    }
-
-    public void atualizar(Vaga vagaAtualizada) {
-        String sql = "UPDATE vagas SET nome = ?, descricao = ?, salario = ?, requisitos = ?, endereco = ?, status = ?, empresa_id = ? WHERE id = ?";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, vagaAtualizada.getNome());
-            stmt.setString(2, vagaAtualizada.getDescricao());
-            stmt.setDouble(3, vagaAtualizada.getSalario());
-            stmt.setString(4, vagaAtualizada.getRequisitos());
-            stmt.setString(5, vagaAtualizada.getEndereco());
-            stmt.setString(6, vagaAtualizada.getStatus());
-            stmt.setLong(7, vagaAtualizada.getEmpresaId());
-            stmt.setLong(8, vagaAtualizada.getId());
-
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected == 0) {
-                throw new SQLException("Vaga com ID " + vagaAtualizada.getId() + " não encontrada.");
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao atualizar a vaga: " + e.getMessage());
-=======
     private List<Vaga> vagas = new ArrayList<>();
     private long nextId = 1; // Contador para gerar IDs
 
@@ -136,38 +32,42 @@ public class VagaRepository {
         return vagas.stream().filter(vaga -> vaga.getId().equals(id)).findFirst();
     }
 
-    public void atualizar(Vaga vagaAtualizada) {
-        if (vagaAtualizada == null) {
-            throw new IllegalArgumentException("A vaga a ser atualizada não pode ser nula.");
-        }
+    // Atualiza a vaga no banco de dados
+    public void atualizar(Vaga vaga) {
+        String sql = "UPDATE vagas SET nome = ?, descricao = ?, salario = ?, requisitos = ?, endereco = ?, status = ?, empresa_id = ? WHERE id = ?";
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, vaga.getNome());
+            preparedStatement.setString(2, vaga.getDescricao());
+            preparedStatement.setBigDecimal(3, BigDecimal.valueOf(vaga.getSalario()));
+            preparedStatement.setString(4, vaga.getRequisitos());
+            preparedStatement.setString(5, vaga.getEndereco());
+            preparedStatement.setString(6, vaga.getStatus());
+            preparedStatement.setLong(7, vaga.getEmpresaId());
+            preparedStatement.setLong(8, vaga.getId());
 
-        Optional<Vaga> vagaExistenteOpt = buscarPorId(vagaAtualizada.getId());
-        if (vagaExistenteOpt.isPresent()) {
-            int index = vagas.indexOf(vagaExistenteOpt.get());
-            vagas.set(index, vagaAtualizada);
-        } else {
-            throw new IllegalArgumentException("Vaga com ID " + vagaAtualizada.getId() + " não encontrada.");
->>>>>>> 51da9c7e0b3b30c2a46b79eff28599efc8d7c368
+            preparedStatement.executeUpdate();
+            System.out.println("Vaga atualizada com sucesso.");
+        } catch (SQLException e) {
+            System.out.println("Erro ao atualizar a vaga: " + e.getMessage());
+        }
+    }
+
+    public void salvarCandidato(Candidato candidato, Long vagaId) {
+        String sql = "INSERT INTO candidatos (vaga_id, nome, cpf) VALUES (?, ?, ?)";
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setLong(1, vagaId);
+            preparedStatement.setString(2, candidato.getNome());
+            preparedStatement.setString(3, candidato.getCpf()); // Presumindo que você tenha um CPF no candidato
+            preparedStatement.executeUpdate();
+            System.out.println("Candidato salvo com sucesso.");
+        } catch (SQLException e) {
+            System.out.println("Erro ao salvar candidato: " + e.getMessage());
         }
     }
 
     public void remover(Long vagaId) {
-<<<<<<< HEAD
-        String sql = "DELETE FROM vagas WHERE id = ?";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setLong(1, vagaId);
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected == 0) {
-                throw new SQLException("Vaga com ID " + vagaId + " não encontrada.");
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao remover a vaga: " + e.getMessage());
-        }
-    }
-=======
         boolean removed = vagas.removeIf(vaga -> vaga.getId().equals(vagaId));
         if (!removed) {
             throw new IllegalArgumentException("Vaga com ID " + vagaId + " não encontrada.");
@@ -177,5 +77,4 @@ public class VagaRepository {
     public long getLastVagaId() {
         return nextId - 1; // Retorna o último ID gerado
     }
->>>>>>> 51da9c7e0b3b30c2a46b79eff28599efc8d7c368
 }
