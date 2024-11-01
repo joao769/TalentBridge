@@ -2,12 +2,16 @@ package com.example.repository;
 
 import com.example.model.Vaga;
 
+<<<<<<< HEAD
 import java.sql.*;
+=======
+>>>>>>> 51da9c7e0b3b30c2a46b79eff28599efc8d7c368
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class VagaRepository {
+<<<<<<< HEAD
     public void salvar(Vaga vaga) {
         String sql = "INSERT INTO vagas (nome, descricao, salario, requisitos, endereco, status, empresa_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
@@ -112,10 +116,43 @@ public class VagaRepository {
             }
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar a vaga: " + e.getMessage());
+=======
+    private List<Vaga> vagas = new ArrayList<>();
+    private long nextId = 1; // Contador para gerar IDs
+
+    public void salvar(Vaga vaga) {
+        if (vaga == null) {
+            throw new IllegalArgumentException("A vaga não pode ser nula.");
+        }
+        vaga.setId(nextId++); // Atribui um novo ID antes de salvar
+        vagas.add(vaga);
+    }
+
+    public List<Vaga> listarTodas() {
+        return new ArrayList<>(vagas); // Retorna uma cópia para evitar modificações externas
+    }
+
+    public Optional<Vaga> buscarPorId(Long id) {
+        return vagas.stream().filter(vaga -> vaga.getId().equals(id)).findFirst();
+    }
+
+    public void atualizar(Vaga vagaAtualizada) {
+        if (vagaAtualizada == null) {
+            throw new IllegalArgumentException("A vaga a ser atualizada não pode ser nula.");
+        }
+
+        Optional<Vaga> vagaExistenteOpt = buscarPorId(vagaAtualizada.getId());
+        if (vagaExistenteOpt.isPresent()) {
+            int index = vagas.indexOf(vagaExistenteOpt.get());
+            vagas.set(index, vagaAtualizada);
+        } else {
+            throw new IllegalArgumentException("Vaga com ID " + vagaAtualizada.getId() + " não encontrada.");
+>>>>>>> 51da9c7e0b3b30c2a46b79eff28599efc8d7c368
         }
     }
 
     public void remover(Long vagaId) {
+<<<<<<< HEAD
         String sql = "DELETE FROM vagas WHERE id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -130,4 +167,15 @@ public class VagaRepository {
             throw new RuntimeException("Erro ao remover a vaga: " + e.getMessage());
         }
     }
+=======
+        boolean removed = vagas.removeIf(vaga -> vaga.getId().equals(vagaId));
+        if (!removed) {
+            throw new IllegalArgumentException("Vaga com ID " + vagaId + " não encontrada.");
+        }
+    }
+
+    public long getLastVagaId() {
+        return nextId - 1; // Retorna o último ID gerado
+    }
+>>>>>>> 51da9c7e0b3b30c2a46b79eff28599efc8d7c368
 }
