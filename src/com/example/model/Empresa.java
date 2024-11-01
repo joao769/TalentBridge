@@ -13,9 +13,14 @@ public class Empresa {
     private List<Vaga> listaDeVagas;
     private List<Candidato> listaDeCandidatos; // Lista de candidatos
 
-    public Empresa() {
+    public Empresa(String nome, String endereco, String cnpj, String telefone, String email) {
+        this.nome = nome;
+        this.endereco = endereco;
+        this.cnpj = cnpj;
+        this.telefone = telefone;
+        this.email = email;
         this.listaDeVagas = new ArrayList<>();
-        this.listaDeCandidatos = new ArrayList<>(); // Inicializando a lista de candidatos
+        this.listaDeCandidatos = new ArrayList<>();
     }
 
     // Getters e Setters

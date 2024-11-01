@@ -14,22 +14,14 @@ public class Vaga {
     private Long empresaId;
     private List<Candidato> candidatos; // Lista de candidatos
 
-    public Long getEmpresaId() {
-        return empresaId;
-    }
-
-    public void setEmpresaId(Long empresaId) {
-        this.empresaId = empresaId;
-    }
-
     // Construtor sem parâmetros
-    public Vaga() {
+    public Vaga(Object o, String nome, String descricao, double salario, Object object, Object o1) {
         this.status = "Disponível"; // Status padrão
         this.candidatos = new ArrayList<>(); // Inicializa a lista de candidatos
     }
 
     // Construtor com parâmetros
-    public Vaga(Long id, String nome, String descricao, double salario, String requisitos, String endereco) {
+    public Vaga(Long id, String nome, String descricao, double salario, String requisitos, String endereco, Long empresaId) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
@@ -38,6 +30,7 @@ public class Vaga {
         this.endereco = endereco;
         this.status = "Disponível"; // Status padrão
         this.candidatos = new ArrayList<>(); // Inicializa a lista de candidatos
+        this.empresaId = empresaId;
     }
 
     // Getters e Setters
@@ -102,6 +95,14 @@ public class Vaga {
         }
         this.status = status;
         System.out.println("Status da vaga atualizado para: " + status);
+    }
+
+    public Long getEmpresaId() {
+        return empresaId;
+    }
+
+    public void setEmpresaId(Long empresaId) {
+        this.empresaId = empresaId;
     }
 
     public List<Candidato> getCandidatos() {

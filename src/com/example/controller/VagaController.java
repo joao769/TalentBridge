@@ -4,62 +4,87 @@ import com.example.model.Candidato;
 import com.example.model.Vaga;
 import com.example.service.VagaService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class VagaController {
-    private VagaService vagaService = new VagaService();
-    private Scanner scanner = new Scanner(System.in);
+    private final VagaService vagaService = new VagaService();
+    private final Scanner scanner = new Scanner(System.in);
 
+    // Método para adicionar uma nova vaga
     public void adicionarVaga() {
-        Vaga vaga = new Vaga();
-        System.out.print("Digite o título da vaga: ");
-        vaga.setNome(scanner.nextLine());
-        System.out.print("Digite a descrição da vaga: ");
-        vaga.setDescricao(scanner.nextLine());
-        System.out.print("Digite o salário da vaga: ");
+        try {
+            System.out.print("Digite o título da vaga: ");
+            String nome = scanner.nextLine();
 
-        double salario = scanner.nextDouble();
-        if (salario <= 0) {
-            System.out.println("Salário deve ser um valor positivo. Vaga não adicionada.");
-            scanner.nextLine(); // Limpa o buffer
-            return;
-        }
-        vaga.setSalario(salario);
-        scanner.nextLine(); // Limpa o buffer do scanner
+            System.out.print("Digite a descrição da vaga: ");
+            String descricao = scanner.nextLine();
 
-        // Adiciona a vaga através do serviço
-        vagaService.salvar(vaga); // Aqui o ID é atribuído dentro do método
+            System.out.print("Digite o salário da vaga: ");
+            double salario = scanner.nextDouble();
+            scanner.nextLine(); // Limpar buffer do scanner
 
-        System.out.print("Digite o ID da empresa associada: ");
-        long empresaId = scanner.nextLong();
-        scanner.nextLine(); // Limpa o buffer do scanner
+            if (salario <= 0) {
+                System.out.println("Erro: Salário deve ser positivo. Operação cancelada.");
+                return;
+            }
 
-        // Aqui você pode querer verificar se a empresa existe antes de associar
-        if (vagaService.associarEmpresa(vaga.getId(), empresaId)) {
-            System.out.println("Vaga associada à empresa com sucesso!");
-        } else {
-            System.out.println("Erro: Empresa não encontrada. Vaga não associada.");
+            System.out.print("Digite o ID da empresa associada: ");
+            long empresaId = scanner.nextLong();
+            scanner.nextLine(); // Limpar buffer do scanner
+
+            // Cria o objeto Vaga e define suas propriedades
+            Vaga vaga = new Vaga(null, nome, descricao, salario, null, null); // Supondo que o ID seja atribuído automaticamente
+
+            // Salva a vaga usando o serviço
+            vagaService.salvar(vaga);
+            // Agora, associa a vaga à empresa
+            if (vagaService.associarEmpresa(vaga.getId(), empresaId)) {
+                System.out.println("Vaga adicionada e associada à empresa com sucesso!");
+            } else {
+                System.out.println("Erro ao associar a vaga à empresa. Verifique o ID da empresa.");
+            }
+
+        } catch (Exception e) {
+            System.out.println("Erro ao adicionar vaga: " + e.getMessage());
         }
     }
 
-    public List<Vaga> listarVagas() {
+    // Método para listar vagas existentes
+    public List<Vaga> listarVagas() { // Alteração do tipo de retorno para List<Vaga>
         try {
-            return vagaService.listarVagas();
+            List<Vaga> vagas = vagaService.listarVagas();
+            if (vagas.isEmpty()) {
+                System.out.println("Nenhuma vaga encontrada.");
+                return vagas; // Retorna a lista vazia
+            } else {
+                System.out.println("Vagas encontradas:");
+                for (Vaga vaga : vagas) {
+                    System.out.println(vaga); // Supondo que o método toString esteja implementado na classe Vaga
+                }
+            }
+            return vagas; // Retorna a lista de vagas
         } catch (Exception e) {
             System.out.println("Erro ao listar vagas: " + e.getMessage());
-            return null;
+            return new ArrayList<>(); // Retorna uma lista vazia em caso de erro
         }
     }
 
+
+    // Método para um candidato se candidatar a uma vaga
     public void seCandidatar(Long vagaId, Candidato candidato) {
-        Vaga vaga = null; // lógica para buscar a vaga pelo ID
-        if (vaga != null) {
-            vaga.adicionarCandidato(candidato);
-            System.out.println("Candidato " + candidato.getNome() + " se candidatou à vaga: " + vaga.getNome());
-        } else {
-            System.out.println("Vaga não encontrada.");
+        try {
+            Vaga vaga = vagaService.buscarVagaPorId(vagaId); // Certifique-se de que o método existe em VagaService
+            if (vaga != null) {
+                vaga.adicionarCandidato(candidato); // Adiciona candidato à lista interna
+                vagaService.salvarCandidato(candidato, vagaId); // Salva candidato no banco de dados
+                System.out.println("Candidato " + candidato.getNome() + " se candidatou à vaga: " + vaga.getNome());
+            } else {
+                System.out.println("Vaga não encontrada.");
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao se candidatar à vaga: " + e.getMessage());
         }
     }
-
 }

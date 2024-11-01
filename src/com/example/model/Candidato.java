@@ -15,6 +15,14 @@ public class Candidato {
     private List<Vaga> vagasCandidatas; // Lista de vagas às quais o candidato se candidatou
 
     public Candidato() {
+        this.id = id;
+        this.cpf = cpf;
+        this.nome = nome;
+        this.endereco = endereco;
+        this.telefone = telefone;
+        this.email = email;
+        this.curriculo = curriculo;
+        this.experienciaProfissional = experienciaProfissional;
         this.vagasCandidatas = new ArrayList<>();
     }
 
