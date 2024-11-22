@@ -40,7 +40,8 @@ public class TalentBridgeApplication implements CommandLineRunner {
             scanner.nextLine(); // Limpa o buffer
 
             switch (opcao) {
-                case 1 -> {
+                case 1:
+                    // Criando uma nova empresa
                     Empresa empresa = new Empresa();
                     System.out.print("Nome da empresa: ");
                     empresa.setNome(scanner.nextLine());
@@ -48,29 +49,43 @@ public class TalentBridgeApplication implements CommandLineRunner {
                     empresa.setEndereco(scanner.nextLine());
                     System.out.print("CNPJ: ");
                     empresa.setCnpj(scanner.nextLine());
-                    empresaService.salvar(empresa);
+                    empresaService.salvar(empresa); // Chama o serviço para salvar
                     System.out.println("Empresa adicionada com sucesso!");
-                }
-                case 2 -> empresaService.listarTodas().forEach(e ->
+                    break;
+
+                case 2:
+                    // Listar todas as empresas
+                    empresaService.listarTodas().forEach(e -> 
                         System.out.println("ID: " + e.getId() + " | Nome: " + e.getNome())
-                );
-                case 3 -> {
+                    );
+                    break;
+
+                case 3:
+                    // Criando uma nova vaga
                     Vaga vaga = new Vaga();
                     System.out.print("Nome da vaga: ");
                     vaga.setNome(scanner.nextLine());
                     System.out.print("Descrição: ");
                     vaga.setDescricao(scanner.nextLine());
-                    vagaService.salvar(vaga);
+                    vagaService.salvar(vaga); // Chama o serviço para salvar
                     System.out.println("Vaga adicionada com sucesso!");
-                }
-                case 4 -> vagaService.listarTodas().forEach(v ->
+                    break;
+
+                case 4:
+                    // Listar todas as vagas
+                    vagaService.listarTodas().forEach(v -> 
                         System.out.println("ID: " + v.getId() + " | Nome: " + v.getNome())
-                );
-                case 5 -> {
+                    );
+                    break;
+
+                case 5:
+                    // Opção para sair
                     System.out.println("Saindo...");
                     return;
-                }
-                default -> System.out.println("Opção inválida.");
+
+                default:
+                    System.out.println("Opção inválida.");
+                    break;
             }
         }
     }

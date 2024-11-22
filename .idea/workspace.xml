@@ -22,8 +22,8 @@
       <change afterPath="$PROJECT_DIR$/src/com/example/repository/VagaRepository.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/com/example/service/EmpresaService.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/com/example/service/VagaService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/src/main/java/com/example/Main.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
