@@ -7,22 +7,23 @@ public class Empresa {
     private String cnpj;
     private String telefone;
     private String email;
+    private String senha;
 
-    public Empresa(int id, String nome, String endereco, String cnpj, String telefone, String email) {
+    public Empresa(int id, String nome, String cnpj, String endereco , String telefone, String email, String senha) {
 		super();
 		this.id = id;
 		this.nome = nome;
-		this.endereco = endereco;
 		this.cnpj = cnpj;
+		this.endereco = endereco;
 		this.telefone = telefone;
 		this.email = email;
+		this.senha = senha;
 	}
 
     public Empresa() {
     	
     }
     
-	// Getters e Setters
     public String getNome() {
         return nome;
     }
@@ -71,9 +72,16 @@ public class Empresa {
         this.id = id;
     }
 
+	public String getSenha() {
+		return senha;
+	}
+
+	public void setSenha(String senha) {
+		this.senha = senha;
+	}
+
 	@Override
 	public String toString() {
-		return "Empresa [id=" + id + ", nome=" + nome + ", endereco=" + endereco + ", cnpj=" + cnpj + ", telefone="
-				+ telefone + ", email=" + email + "]";
+		return "Empresa{id=" + id + ", nome='" + nome + "', cnpj='" + cnpj + "'}";
 	}
 }
