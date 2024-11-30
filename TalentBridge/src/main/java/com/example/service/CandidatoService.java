@@ -1,7 +1,6 @@
 package main.java.com.example.service;
 
 import java.sql.SQLException;
-import java.util.List;
 
 import main.java.com.example.model.Candidato;
 import main.java.com.example.repository.CandidatoRepository;
@@ -10,63 +9,35 @@ public class CandidatoService {
 
     private CandidatoRepository candidatoRepository;
 
-    // Construtor
     public CandidatoService() {
         this.candidatoRepository = new CandidatoRepository();
     }
 
-    // Método para adicionar um candidato
-    public void addCandidato(Candidato candidato) {
+    public void adicionarCandidato(Candidato candidato) {
         try {
-            candidatoRepository.save(candidato);
+            candidatoRepository.adicionarCandidato(candidato);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Erro ao adicionar candidato no repositório: " + e.getMessage());
         }
     }
 
-    // Método para listar todos os candidatos
-    public List<Candidato> listCandidatos() {
+    public int fazerLogin(String email, String senha) {
         try {
-            return candidatoRepository.getAll();
+            Candidato candidato = candidatoRepository.buscarPorEmail(email);
+            if (candidato != null && senha.equals(candidato.getSenha())) { 
+                return candidato.getId();  
+            }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Erro ao fazer login: " + e.getMessage());
         }
-        return null;
+        return -1;  
     }
 
-    // Método para excluir um candidato
-    public void deleteCandidato(int id) {
+    public void editarPerfil(int candidatoLogadoId, String novoNome, String novoEndereco, String novoTelefone, String novoEmail) {
         try {
-            candidatoRepository.delete(id);
+            candidatoRepository.editarPerfil(candidatoLogadoId, novoNome, novoEndereco, novoTelefone, novoEmail);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Erro ao atualizar candidato: " + e.getMessage());
         }
     }
-
-    // Método para buscar um candidato pelo id
-    public Candidato getCandidatoById(int id) {
-        try {
-            return candidatoRepository.getById(id);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-    
-    public void atualizarCurriculoById(int id, String novoCurriculo) {
-        try {
-            candidatoRepository.atualizarCurriculo(id, novoCurriculo);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    public void editarPerfilById(int id, String novoNome, String novoEndereco, String novoTelefone, String novoEmail) {
-        try {
-            candidatoRepository.editarPerfil(id, novoNome, novoEndereco, novoTelefone, novoEmail);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    
 }
