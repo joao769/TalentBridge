@@ -1,175 +1,235 @@
 package main.java.com.example.view;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
 
 import main.java.com.example.controller.EmpresaController;
 import main.java.com.example.controller.VagaController;
-import main.java.com.example.model.Empresa;
+import main.java.com.example.model.Candidato;
 import main.java.com.example.model.Vaga;
+import main.java.com.example.util.EntradaUtils;
+import main.java.com.example.util.SessionContext;
 
 public class EmpresaView {
 
     private EmpresaController empresaController;
-    private VagaController vagaController; // Controlador de vagas
-    private Scanner scanner;
+    private VagaController vagaController; 
+    private Scanner sc;
 
-    // Construtor
     public EmpresaView(EmpresaController empresaController, VagaController vagaController) {
         this.empresaController = empresaController;
         this.vagaController = vagaController;
-        this.scanner = new Scanner(System.in);
+        this.sc = new Scanner(System.in);
     }
 
-    // Método para exibir o menu de opções
     public void showMenu() {
         while (true) {
-            System.out.println("\n--- Sistema de Cadastro de Empresas ---");
-            System.out.println("\n1. Adicionar Empresa");
-            System.out.println("2. Listar Empresas");
-            System.out.println("3. Buscar Empresa por ID");
-            System.out.println("4. Excluir Empresa");
-            System.out.println("5. Editar Empresa");
-            System.out.println("6. Adicionar Vaga");
-            System.out.println("7. Remover Vaga");
+            System.out.println("\n--- Menu ---\n");
+            System.out.println("1. Fazer Login");
+            System.out.println("2. Se cadastrar");
             System.out.println("0. Sair");
-            System.out.print("Escolha uma opção: ");
             
-            int escolha = scanner.nextInt();
-            scanner.nextLine();
-            
-            switch (escolha) {
+            int opcao = EntradaUtils.lerEntradaValidaInt(sc, "Escolha uma opção:");
+
+            switch (opcao) {
                 case 1:
-                    adicionarEmpresa();
+                	fazerLogin();
                     break;
                 case 2:
-                    listarEmpresas();
-                    break;
-                case 3:
-                    buscarEmpresa();
-                    break;
-                case 4:
-                    excluirEmpresa();
-                    break;
-                case 5:
-                    editarEmpresa();
-                    break;
-                case 6:
-                    adicionarVaga();
-                    break;
-                case 7:
-                    removerVaga();
+                    adicionarEmpresa();
                     break;
                 case 0:
-                    System.out.println("Saindo...");
+                    System.out.println("\nSaindo...");
                     return;
                 default:
-                    System.out.println("Opção inválida. Tente novamente.");
+                    System.out.println("\nOpção inválida. Tente novamente.");
             }
         }
     }
 
     private void adicionarEmpresa() {
-        System.out.println("\n--- Adicionar Empresa ---");
+        System.out.println("\n--- Cadastro ---\n");
         
-        System.out.print("Nome: ");
-        String nome = scanner.nextLine();
-        
-        System.out.print("Endereço: ");
-        String endereco = scanner.nextLine(); 
-        
-        System.out.print("CNPJ: ");
-        String cnpj = scanner.nextLine(); 
-        
-        System.out.print("Telefone: ");
-        String telefone = scanner.nextLine(); 
-        
-        System.out.print("Email");
-        String email = scanner.nextLine();
+        String nome = EntradaUtils.lerEntradaValidaNome(sc, "Digite o nome da empresa:");
+        String cnpj = EntradaUtils.lerEntradaValida(sc, "Digite o CNPJ da empresa:", "\\d{14}");
+        String endereco = EntradaUtils.lerEntradaValida(sc, "Digite o endereço da empresa:");
+        String telefone = EntradaUtils.lerEntradaValida(sc, "Digite o telefone da empresa (11 dígitos):", "\\d{11}");
+        String email = EntradaUtils.lerEntradaValida(sc, "Digite o email da empresa:");
+        String senha = EntradaUtils.lerEntradaValida(sc, "Digite uma senha:");
 
-        Empresa empresa = new Empresa(0, nome, endereco, cnpj, telefone, email);
-        empresaController.addEmpresa(empresa);
+        empresaController.adicionarEmpresa(nome, cnpj, endereco, telefone, email, senha);
 
-        System.out.println("Empresa adicionada com sucesso!");
+        System.out.println("\nEmpresa adicionada com sucesso!");
+    }
+    
+    private void fazerLogin() {
+        System.out.println("\n--- Login Empresa ---\n");
+        
+        String email = EntradaUtils.lerEntradaValida(sc, "Digite o email da empresa:");
+        String senha = EntradaUtils.lerEntradaValida(sc, "Digite a senha da empresa:");
+
+        try {
+            int empresaId = empresaController.fazerLogin(email, senha);
+            if (empresaId != -1) { 
+                SessionContext.setUsuarioLogadoId(empresaId);
+                System.out.println("\nLogin realizado com sucesso!");
+                menu();
+            } else {
+                System.out.println("\nEmail ou senha incorretos. Tente novamente.");
+            }
+        } catch (SQLException e) {
+            System.err.println("\nErro ao realizar o login: " + e.getMessage());
+        }
     }
 
-    private void listarEmpresas() {
-        List<Empresa> empresas = empresaController.listEmpresa();
-        if (empresas.isEmpty()) {
-            System.out.println("Nenhuma empresa encontrada.");
-        } else {
-            System.out.println("\nLista de Empresas:");
-            for (Empresa e : empresas) {
-                System.out.println(e);
+
+    private void menu() {
+    	
+        while (true) {
+            System.out.println("\n--- Menu Empresa ---\n");
+            System.out.println("1. Atualizar os dados da empresa");
+            System.out.println("2. Adicionar Vaga");
+            System.out.println("3. Remover Vaga");
+            System.out.println("4. Vizalizar os candidatos aplicados para a Vaga");
+            System.out.println("5. Selecionar um candidato aplicado para a Vaga");
+            System.out.println("0. Sair");
+            
+            int opcao = EntradaUtils.lerEntradaValidaInt(sc, "Escolha uma opção:");
+
+            switch (opcao) {
+                case 1:
+                	editarEmpresa();
+                	break;
+                case 2:
+                	adicionarVaga();
+                	break;
+                case 3:
+                	removerVaga();
+                    break;
+                case 4:
+                	vizualizarCandidatos();
+                    break;
+                case 5:
+                	selecionarCandidato();
+                	break;
+                case 0:
+                    System.out.println("\nSaindo...");
+                    SessionContext.logout();
+                    return;
+                default:
+                    System.out.println("\nOpção inválida. Tente novamente.");
             }
         }
     }
-
-    private void buscarEmpresa() {
-        System.out.print("Digite o ID da empresa: ");
-        int id = scanner.nextInt();
-
-        Empresa empresa = empresaController.getEmpresaById(id);
-        if (empresa != null) {
-            System.out.println("\nEmpresa encontrada: ");
-            System.out.println(empresa);
-        } else {
-            System.out.println("Empresa não encontrada.");
-        }
-    }
-
-    private void excluirEmpresa() {
-        System.out.print("Digite o ID da empresa a ser excluída: ");
-        int id = scanner.nextInt();
-
-        empresaController.deleteEmpresa(id);
-        System.out.println("Empresa excluída com sucesso!");
-    }
-
+  
     private void editarEmpresa() {
-        System.out.print("Digite o ID da empresa que deseja editar: ");
-        int id = scanner.nextInt();
-        scanner.nextLine(); // Limpa o buffer
-
-        System.out.print("Digite o novo nome: ");
-        String novoNome = scanner.nextLine();
-        
-        System.out.print("Digite o novo endereço: ");
-        String novoEndereco = scanner.nextLine();
-        
-        System.out.print("Digite o novo telefone: ");
-        String novoTelefone = scanner.nextLine();
-        
-        System.out.print("Digite o novo email: ");
-        String novoEmail = scanner.nextLine();
-
-        empresaController.editarEmpresaById(id, novoNome, novoEndereco, novoTelefone, novoEmail);
-        System.out.println("Empresa atualizada com sucesso!");
+    	
+        int empresaLogadaId = SessionContext.getUsuarioLogadoId();
+        if (empresaLogadaId == -1) {
+            System.out.println("Erro: Nenhuma empresa está logada.");
+            return;
+        }
+    	
+        System.out.println("\n--- Atualizar Empresa ---\n");
+        String novoNome = EntradaUtils.lerEntradaValidaNome(sc, "Digite o novo nome da empresa:");
+        String novoEndereco = EntradaUtils.lerEntradaValida(sc, "Digite o novo endereço da empresa:");
+        String novoTelefone = EntradaUtils.lerEntradaValida(sc, "Digite o novo telefone da empresa (11 dígitos):", "\\d{11}");
+        String novoEmail = EntradaUtils.lerEntradaValidaNome(sc, "Digite o novo email da empresa:");
+        empresaController.editarEmpresa(empresaLogadaId, novoNome, novoEndereco, novoTelefone, novoEmail);
+        System.out.println("\nDados da empresa atualizada com sucesso!");
     }
-
-    // Métodos para gerenciar vagas
-
+    
     private void adicionarVaga() {
-        System.out.print("Digite o ID da empresa para adicionar a vaga: ");
-        int empresaId = scanner.nextInt();
-        scanner.nextLine();
-        
-        System.out.print("Descrição da Vaga: ");
-        String descricao = scanner.nextLine();
-        
-        System.out.print("Cargo da Vaga: ");
-        String cargo = scanner.nextLine();
-                
-        Vaga vaga = new Vaga(0, descricao, cargo, empresaId);
-        vagaController.adicionarVaga(vaga, empresaId);
+    	
+        int empresaLogadaId = SessionContext.getUsuarioLogadoId();
+        if (empresaLogadaId == -1) {
+            System.out.println("Erro: Nenhuma empresa está logada.");
+            return;
+        }
 
-        System.out.println("Vaga adicionada com sucesso!");
+        System.out.println("\n--- Adicionar Vaga ---\n");
+        String titulo = EntradaUtils.lerEntradaValida(sc, "Digite o título da vaga:");
+        String descricao = EntradaUtils.lerEntradaValida(sc, "Digite a descrição da vaga:");
+        String cargo = EntradaUtils.lerEntradaValida(sc, "Digite o cargo da vaga:");
+        String cargaHoraria = EntradaUtils.lerEntradaValida(sc, "Digite a carga horária da vaga:");
+        double salario = EntradaUtils.lerEntradaValidaDouble(sc, "Digite o salário da vaga:");
+        String status = "disponivel";
+
+        vagaController.adicionarVaga(empresaLogadaId, titulo, descricao, cargo, cargaHoraria, salario, status);
+        System.out.println("\nVaga adicionada com sucesso!");
     }
 
+   
     private void removerVaga() {
-        System.out.print("Digite o ID da vaga a ser removida: ");
-        int vagaId = scanner.nextInt();
-
+    	
+        int empresaLogadaId = SessionContext.getUsuarioLogadoId();
+        if (empresaLogadaId == -1) {
+            System.out.println("Erro: Nenhuma empresa está logada.");
+            return;
+        }
+    	
+        System.out.println("\n--- Remover Vaga ---");
+        List<Vaga> vagas = vagaController.listarVagasPorEmpresa(empresaLogadaId);
+        if (vagas.isEmpty()) {
+            System.out.println("\nNenhuma vaga encontrada para sua empresa.");
+            return;
+        }
+        System.out.println("Vagas disponíveis:");
+        for (Vaga vaga : vagas) {
+            System.out.println("ID: " + vaga.getId() + " | Título: " + vaga.getTitulo());
+        }
+        int vagaId = EntradaUtils.lerEntradaValidaInt(sc, "Digite o ID da vaga que deseja remover:");
         vagaController.removerVaga(vagaId);
+        System.out.println("\nVaga removida com sucesso!");
+    }
+
+    private void vizualizarCandidatos() {
+        System.out.println("\n--- Candidatos Aplicados Na Vaga ---");
+
+        int vagaId = EntradaUtils.lerEntradaValidaInt(sc, "\nDigite o ID da vaga que deseja visualizar os candidatos aplicados:");
+
+		String statusVaga = vagaController.consultarStatusVaga(vagaId);
+		if ("fechada".equalsIgnoreCase(statusVaga) || "preenchida".equalsIgnoreCase(statusVaga)) {
+		    System.out.println("\nA vaga está preenchida.");
+		    return;
+		}
+
+		List<Candidato> candidatos = vagaController.listarCandidatosAplicados(vagaId);
+
+		if (candidatos.isEmpty()) {
+		    System.out.println("\nNenhum candidato se aplicou para essa vaga.");
+		} else {
+		    for (Candidato candidato : candidatos) {
+		        System.out.println("\nCandidato ID: " + candidato.getId());
+		        System.out.println("Nome: " + candidato.getNome());
+		        System.out.println("E-mail: " + candidato.getEmail());
+
+		        if (candidato.getCurriculo() != null) {
+		            System.out.println("Currículo de " + candidato.getNome() + ":");
+		            System.out.println("  - Experiência Profissional: " + candidato.getCurriculo().getExperienciaProfissional()); 
+		            System.out.println("  - Formação Acadêmica: " + candidato.getCurriculo().getFormacaoAcademica()); 
+		            System.out.println("  - Habilidades: " + candidato.getCurriculo().getHabilidades()); 
+		        } else {
+		            System.out.println("Currículo não disponível.");
+		        }
+		    }
+		}
+    }
+
+    private void selecionarCandidato() {
+        System.out.println("\n--- Selecionar Candidato ---\n");
+
+        int vagaId = EntradaUtils.lerEntradaValidaInt(sc, "Digite o ID da vaga:");
+        int candidatoId = EntradaUtils.lerEntradaValidaInt(sc, "Digite o ID do candidato que deseja selecionar:");
+
+		List<Candidato> candidatos = vagaController.listarCandidatosAplicados(vagaId);
+		if (candidatos.isEmpty()) {
+		    System.out.println("\nNão há candidatos aplicados para esta vaga.");
+		    return; 
+		}
+
+		vagaController.selecionarCandidato(vagaId, candidatoId);
+		System.out.println("Candidato selecionado com sucesso!");
     }
 }
