@@ -1,158 +1,282 @@
 package main.java.com.example.view;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
 
 import main.java.com.example.controller.CandidatoController;
-import main.java.com.example.model.Candidato;
+import main.java.com.example.controller.CurriculoController;
+import main.java.com.example.controller.VagaController;
+import main.java.com.example.model.Vaga;
+import main.java.com.example.util.EntradaUtils;
+import main.java.com.example.util.SessionContext;
 
 public class CandidatoView {
 
     private CandidatoController candidatoController;
-    private Scanner scanner;
+    private CurriculoController curriculoController;
+    private VagaController vagaController;
+    private Scanner sc;
 
-    // Construtor
-    public CandidatoView(CandidatoController candidatoController) {
+    public CandidatoView(CandidatoController candidatoController, CurriculoController curriculoController, VagaController vagaController) {
         this.candidatoController = candidatoController;
-        this.scanner = new Scanner(System.in);
+        this.curriculoController = curriculoController;
+        this.vagaController = vagaController;
+        this.sc = new Scanner(System.in);
     }
 
-    // Método para exibir o menu de opções
     public void showMenu() {
         while (true) {
-            System.out.println("\n--- Sistema de Cadastro de Candidatos ---");
-            System.out.println("\n1. Adicionar Candidato");
-            System.out.println("2. Listar Candidatos");
-            System.out.println("3. Buscar Candidato por ID");
-            System.out.println("4. Excluir Candidato");
-            System.out.println("5. Editar Perfil");
-            System.out.println("6. Atualizar Currículo");
+            System.out.println("\n--- Bem vindo ---");
+            System.out.println("\n1. Fazer login");
+            System.out.println("2. Se cadastrar");
             System.out.println("0. Sair");
-            System.out.print("Escolha uma opção: ");
             
-            int escolha = scanner.nextInt();
-            scanner.nextLine(); // Limpa o buffer do scanner
+            int opcao = EntradaUtils.lerEntradaValidaInt(sc, "Escolha uma opção:");
 
-            switch (escolha) {
+            switch (opcao) {
                 case 1:
-                    adicionarCandidato();
+                	fazerLogin();
                     break;
                 case 2:
-                    listarCandidatos();
-                    break;
-                case 3:
-                    buscarCandidato();
-                    break;
-                case 4:
-                    excluirCandidato();
-                    break;
-                case 5:
-                    editarPerfil();
-                    break;
-                case 6:
-                	atualizarCurriculo();
+                    adicionarCandidato();
                     break;
                 case 0:
-                    System.out.println("Saindo...");
+                    System.out.println("\nSaindo...");
                     return;
                 default:
-                    System.out.println("Opção inválida. Tente novamente.");
+                    System.out.println("\nOpção inválida. Tente novamente.");
             }
         }
     }
 
-    // Método para adicionar um novo candidato
     private void adicionarCandidato() {
-        System.out.print("Nome: ");
-        String nome = scanner.nextLine();
+        System.out.println("\n--- Cadastro ---");    	
+        String nome = EntradaUtils.lerEntradaValidaNome(sc, "Digite seu nome:");        
+        String cpf = EntradaUtils.lerEntradaValida(sc, "Digite seu CPF:", "\\d{11}");        
+        String endereco = EntradaUtils.lerEntradaValida(sc, "Digite seu endereço:");       
+        String telefone = EntradaUtils.lerEntradaValida(sc, "Digite seu telefone (11 dígitos):", "\\d{11}");
+        String email = EntradaUtils.lerEntradaValida(sc, "Digite seu email:");  
+        String senha = EntradaUtils.lerEntradaValida(sc, "Digite uma senha:");
         
-        System.out.print("CPF: ");
-        String cpf = scanner.nextLine();
-
-        System.out.print("Endereço: ");
-        String endereco = scanner.nextLine();
-
-        System.out.print("Telefone: ");
-        String telefone = scanner.nextLine();
+        candidatoController.adicionarCandidato(nome, cpf, endereco, telefone, email, senha);
+        System.out.println("\nCandidato adicionado com sucesso!");
         
-        System.out.print("Email: ");
-        String email = scanner.nextLine();
-        
-        System.out.print("Currículo: ");
-        String curriculo = scanner.nextLine();
-        
-        System.out.print("Experiência Profissional: ");
-        String experiencia = scanner.nextLine();
-
-        Candidato candidato = new Candidato(0, nome, cpf, endereco, telefone, email, curriculo, experiencia);
-        candidatoController.addCandidato(candidato);
-
-        System.out.println("Candidato adicionado com sucesso!");
     }
 
-    // Método para listar todos os candidatos
-    private void listarCandidatos() {
-        List<Candidato> candidatos = candidatoController.listCandidatos();
-        if (candidatos.isEmpty()) {
-            System.out.println("Nenhum candidato encontrado.");
-        } else {
-            System.out.println("\nLista de Candidatos:");
-            for (Candidato c : candidatos) {
-                System.out.println(c);
+    private void fazerLogin() {
+        System.out.println("\n--- Login Candidato ---\n");
+        
+        String email = EntradaUtils.lerEntradaValida(sc, "Digite seu email:");
+        String senha = EntradaUtils.lerEntradaValida(sc, "Digite sua senha:");
+
+        try {
+            int candidatoId = candidatoController.fazerLogin(email, senha);
+            if (candidatoId != -1) { 
+                SessionContext.setUsuarioLogadoId(candidatoId);
+                System.out.println("\nLogin realizado com sucesso!\n");
+
+                if (!curriculoController.verificarCurriculo(candidatoId)) {
+                    System.out.println("\nVocê ainda não possui um currículo. Vamos criar um agora.\n");
+                    adicionarCurriculo(candidatoId);
+                }
+
+                menu();
+            } else {
+                System.out.println("\nEmail ou senha incorretos. Tente novamente.");
+            }
+        } catch (SQLException e) {
+            System.err.println("\nErro ao realizar o login: " + e.getMessage());
+        }
+    }
+
+
+    
+    private void menu() {
+    	
+        while (true) {
+            System.out.println("\n--- Menu Candidato ---\n");
+            System.out.println("1. Atualizar o perfil");
+            System.out.println("2. Atualizar o currículo");
+            System.out.println("3. Vizualizar o currículo");
+            System.out.println("4. Vizualizar vagas disponíveis");
+            System.out.println("5. Se candidatar para uma vaga");
+            System.out.println("6. Remover candidatura para vaga");
+            System.out.println("7. Status da vaga aplicada");
+            System.out.println("0. Sair");
+            
+            int opcao = EntradaUtils.lerEntradaValidaInt(sc, "Escolha uma opção:");
+
+            switch (opcao) {
+                case 1:
+                	atualizarPerfil();
+                	break;
+                case 2:
+                	atualizarCurriculo();
+                    break;
+                case 3:
+                	vizualizarCurriculo();
+                    break;
+                case 4:
+                	vizualizarVagas();
+                    break;
+                case 5:
+                	candidatar();
+                    break;
+                case 6:
+                	removerCandidatura();
+                    break;
+                case 7:
+                	vizualizarVagaAplicada();
+                    break;
+                case 0:
+                    System.out.println("\nSaindo...");
+                    SessionContext.logout();
+                    return;
+                default:
+                    System.out.println("\nOpção inválida. Tente novamente.");
             }
         }
     }
+    
+    private void atualizarPerfil() {
+    	
+        int candidatoLogadoId = SessionContext.getUsuarioLogadoId();
+        if (candidatoLogadoId == -1) {
+            System.out.println("\nErro: Nenhum candidato está logado.");
+            return;
+        }
+    	
+        System.out.println("\n--- Atualizar Perfil ---\n");
+        String novoNome = EntradaUtils.lerEntradaValidaNome(sc, "Digite o novo nome:");
+        String novoEndereco = EntradaUtils.lerEntradaValida(sc, "Digite o novo endereço:");
+        String novoTelefone = EntradaUtils.lerEntradaValida(sc, "Digite o novo telefone (11 dígitos):", "\\d{11}");
+        String novoEmail = EntradaUtils.lerEntradaValida(sc, "Digite o novo email:");
 
-    // Método para buscar um candidato pelo ID
-    private void buscarCandidato() {
-        System.out.print("Digite o ID do candidato: ");
-        int id = scanner.nextInt();
 
-        Candidato candidato = candidatoController.getCandidatoById(id);
-        if (candidato != null) {
-            System.out.println("\nCandidato encontrado: ");
-            System.out.println(candidato);
-        } else {
-            System.out.println("Candidato não encontrado.");
+        candidatoController.editarPerfil(candidatoLogadoId, novoNome, novoEndereco, novoTelefone, novoEmail);
+        
+        System.out.println("\nPerfil atualizado atualizado com sucesso!");
+    }
+    
+    private void adicionarCurriculo(int candidatoId) {
+        System.out.println("\n--- Criar Currículo ---\n");
+
+        String experienciaProfissional = EntradaUtils.lerEntradaValida(sc, "Digite sua experiência profissional:");
+        String formacaoAcademica = EntradaUtils.lerEntradaValida(sc, "Digite sua formação acadêmica:");
+        String habilidades = EntradaUtils.lerEntradaValida(sc, "Digite suas habilidades:");
+
+        try {
+            curriculoController.adicionarCurriculo(candidatoId, experienciaProfissional, formacaoAcademica, habilidades);
+            System.out.println("\nCurrículo criado com sucesso!");
+        } catch (SQLException e) {
+            System.err.println("\nErro ao criar currículo: " + e.getMessage());
         }
     }
 
-    // Método para excluir um candidato
-    private void excluirCandidato() {
-        System.out.print("Digite o ID do candidato a ser excluído: ");
-        int id = scanner.nextInt();
-        
-        candidatoController.deleteCandidato(id);
-    }
     
     private void atualizarCurriculo() {
-        System.out.print("Digite o ID do candidato que deseja mudar o curriculo: ");
-        int id = scanner.nextInt();
-        scanner.nextLine(); // Limpa o buffer do scanner
-
-        System.out.print("Digite o novo currículo: ");
-        String novoCurriculo = scanner.nextLine();
+    	
+        int candidatoLogadoId = SessionContext.getUsuarioLogadoId();
+        if (candidatoLogadoId == -1) {
+            System.out.println("Erro: Nenhum candidato está logado.");
+            return;
+        }
         
-        candidatoController.atualizarCurriculoById(id, novoCurriculo);
+        System.out.println("\n--- Atualizar Currículo ---\n");
+        String experiencia = EntradaUtils.lerEntradaValida(sc, "Digite sua nova experiência profissional:");
+        String formacao = EntradaUtils.lerEntradaValida(sc, "Digite sua nova formação acadêmica:");
+        String habilidades = EntradaUtils.lerEntradaValida(sc, "Digite suas novas habilidades:");
+
+        curriculoController.atualizarCurriculo(candidatoLogadoId, experiencia, formacao, habilidades);
+        System.out.println("\nCurrículo atualizado com sucesso.");
     }
     
-    private void editarPerfil() {
-        System.out.print("Digite o ID do candidato que deseja editar o perfil: ");
-        int id = scanner.nextInt();
-        scanner.nextLine(); 
-
-        System.out.print("Digite o novo nome: ");
-        String novoNome = scanner.nextLine();
-        
-        System.out.print("Digite o novo endereço: ");
-        String novoEndereco = scanner.nextLine();
-        
-        System.out.print("Digite o novo telefone: ");
-        String novoTelefone = scanner.nextLine();
-        
-        System.out.print("Digite o novo email: ");
-        String novoEmail = scanner.nextLine();
-        
-        candidatoController.editarPerfilById(id, novoNome, novoEndereco, novoTelefone, novoEmail);
+    private void vizualizarCurriculo() {
+    	
+        int candidatoLogadoId = SessionContext.getUsuarioLogadoId();
+        if (candidatoLogadoId == -1) {
+            System.out.println("Erro: Nenhum candidato está logado.");
+            return;
+        }
+    	
+        curriculoController.visualizarCurriculo(candidatoLogadoId);
     }
+    
+    private void vizualizarVagas() {
+        System.out.println("\n--- Vagas Disponíveis ---\n");
+        List<Vaga> vagas = vagaController.listarVagasDisponiveis();
+
+        if (vagas.isEmpty()) {
+            System.out.println("Nenhuma vaga disponível.");
+        } else {
+            for (Vaga vaga : vagas) {
+                System.out.println("Empresa: " + vaga.getNomeEmpresa());
+                System.out.println("Id da vaga: " + vaga.getId());
+                System.out.println("Título: " + vaga.getTitulo());
+                System.out.println("Descrição: " + vaga.getDescricao());
+                System.out.println("Cargo: " + vaga.getCargo());
+                System.out.println("Carga horária: " + vaga.getCargaHoraria() + " horas semanais");
+                System.out.println("Salário: " + formatarPreco(vaga.getSalario()));
+                System.out.println("Status: " + vaga.getStatus() + "\n");
+            }
+        }
+    }
+    
+    private static String formatarPreco(double preco) {
+        return String.format("R$ %.2f", preco);
+    }
+    
+    private void candidatar() {
+        System.out.println("--- Aplicar Para Vaga ---\n");
+        int candidatoLogadoId = SessionContext.getUsuarioLogadoId();
+        if (candidatoLogadoId == -1) {
+            System.out.println("Erro: Nenhum candidato está logado.");
+            return;
+        }
+    	
+        System.out.println("\nVagas Disponíveis:\n");
+        List<Vaga> vagas = vagaController.listarVagasDisponiveis();
+
+        if (vagas.isEmpty()) {
+            System.out.println("\nNenhuma vaga disponível.");
+        } else {
+            for (Vaga vaga : vagas) {
+                System.out.println("\nEmpresa: " + vaga.getNomeEmpresa());
+                System.out.println("Id da vaga: " + vaga.getId());
+                System.out.println("Título: " + vaga.getTitulo() + "\n");
+            }
+        }
+        
+        int vagaId = EntradaUtils.lerEntradaValidaInt(sc, "Digite o id da vaga:");
+        vagaController.adicionarCandidato(candidatoLogadoId, vagaId);
+    }
+    
+    private void removerCandidatura() {
+    	
+        int candidatoLogadoId = SessionContext.getUsuarioLogadoId();
+        if (candidatoLogadoId == -1) {
+            System.out.println("Erro: Nenhum candidato está logado.");
+            return;
+        }
+    	
+        System.out.println("\n--- Remover Candidatura da Vaga ---\n");
+        int vagaId = EntradaUtils.lerEntradaValidaInt(sc, "Digite o id da vaga:");
+        vagaController.removerCandidatura(candidatoLogadoId, vagaId);
+    }
+    
+    private void vizualizarVagaAplicada() {
+        int candidatoLogadoId = SessionContext.getUsuarioLogadoId();
+        if (candidatoLogadoId == -1) {
+            System.out.println("Erro: Nenhum candidato está logado.");
+            return;
+        }
+
+        System.out.println("\n--- Visualizar Status da Vaga ---\n");
+        int vagaId = EntradaUtils.lerEntradaValidaInt(sc, "Digite o id da vaga:");
+
+        String status = vagaController.consultarStatusCandidatura(candidatoLogadoId, vagaId);
+		System.out.println("\nStatus da candidatura para a vaga id " + vagaId + ": " + status);
+    }
+
 } 
