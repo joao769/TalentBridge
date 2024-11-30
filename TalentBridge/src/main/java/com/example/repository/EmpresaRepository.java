@@ -2,40 +2,58 @@ package main.java.com.example.repository;
 
 import main.java.com.example.database.DatabaseConnector;
 import main.java.com.example.model.Empresa;
-import main.java.com.example.model.Vaga;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class EmpresaRepository {
 
-    // Criar empresa
-    public void criarEmpresa(Empresa empresa) throws SQLException {
-        String query = "INSERT INTO empresa (nome, endereco, cnpj, telefone, email) " +
-                       "VALUES (?, ?, ?, ?, ?)";
+    public void adicionarEmpresa(Empresa empresa) throws SQLException {
+        String query = "INSERT INTO empresa (nome, cnpj, endereco, telefone, email, senha) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, empresa.getNome());
-            stmt.setString(2, empresa.getEndereco());
-            stmt.setString(3, empresa.getCnpj());
+            stmt.setString(2, empresa.getCnpj());
+            stmt.setString(3, empresa.getEndereco());
             stmt.setString(4, empresa.getTelefone());
             stmt.setString(5, empresa.getEmail());
+            stmt.setString(6, empresa.getSenha()); 
 
             stmt.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("Erro ao salvar empresa: " + e.getMessage());
+            System.err.println("Erro ao salvar empresa no banco de dados: " + e.getMessage());
             throw e; 
         }
     }
 
-    public void atualizarEmpresa(int id, String novoNome, String novoEndereco, String novoTelefone, String novoEmail) throws SQLException {
+    public Empresa buscarPorEmail(String email) throws SQLException {
+        String query = "SELECT * FROM empresa WHERE email = ?";
+
+        try (Connection conn = DatabaseConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return new Empresa(
+                    rs.getInt("id"),
+                    rs.getString("nome"),
+                    rs.getString("cnpj"),
+                    rs.getString("endereco"),
+                    rs.getString("telefone"),
+                    rs.getString("email"),
+                    rs.getString("senha")
+                );
+            }
+        }
+        return null;  
+    }
+    
+    public void atualizarDados(int id, String novoNome, String novoEndereco, String novoTelefone, String novoEmail) throws SQLException {
         String query = "UPDATE empresa SET nome = ?, endereco = ?, telefone = ?, email = ? WHERE id = ?";
         
         try (Connection conn = DatabaseConnector.getConnection();
@@ -45,16 +63,15 @@ public class EmpresaRepository {
             stmt.setString(2, novoEndereco);
             stmt.setString(3, novoTelefone);
             stmt.setString(4, novoEmail);
-            stmt.setInt(5, id);
+            stmt.setInt(5, id);  
 
             stmt.executeUpdate();
-            System.out.println("Empresa atualizada com sucesso!");
         } catch (SQLException e) {
-            System.err.println("Erro ao atualizar empresa: " + e.getMessage());
+            System.err.println("Erro ao atualizar empresa no banco: " + e.getMessage());
             throw e;
         }
     }
-    
+
     public void deletarEmpresa(int empresaId) throws SQLException {
         String query = "DELETE FROM empresa WHERE id = ?";
         
@@ -62,15 +79,18 @@ public class EmpresaRepository {
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, empresaId);
-            stmt.executeUpdate();
-            System.out.println("Empresa deletada com sucesso!");
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Empresa deletada com sucesso!");
+            } else {
+                System.out.println("Nenhuma empresa encontrada com o ID fornecido.");
+            }
         } catch (SQLException e) {
             System.err.println("Erro ao deletar empresa: " + e.getMessage());
             throw e;
         }
     }
-    
-    // Listar todas as empresas
+
     public List<Empresa> listarEmpresas() throws SQLException {
         List<Empresa> empresas = new ArrayList<>();
         String query = "SELECT * FROM empresa";
@@ -89,6 +109,10 @@ public class EmpresaRepository {
                 empresa.setEmail(rs.getString("email"));
                 empresas.add(empresa);
             }
+
+            if (empresas.isEmpty()) {
+                System.out.println("Nenhuma empresa encontrada.");
+            }
         } catch (SQLException e) {
             System.err.println("Erro ao listar empresas: " + e.getMessage());
             throw e;
@@ -96,7 +120,6 @@ public class EmpresaRepository {
         return empresas;
     }
 
-    // Buscar empresa pelo ID
     public Empresa getById(int id) throws SQLException {
         Empresa empresa = null;
         String query = "SELECT * FROM empresa WHERE id = ?";
@@ -104,7 +127,7 @@ public class EmpresaRepository {
         try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setInt(1, id); 
+            stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     empresa = new Empresa();
